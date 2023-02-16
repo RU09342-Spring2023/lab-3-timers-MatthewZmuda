@@ -54,7 +54,7 @@ void timerInit(){
     // @TODO Initialize Timer B1 in Continuous Mode using ACLK as the source CLK with Interrupts turned on
     TB1CTL = TBSSEL_1 | MC_2 | TBCLR;           // ACLK, continuous mode, clear TAR
     // Set CCR0 to control the LED blinking frequency
-        TB1CCR0 = 32768/2;                          // Set CCR0 to toggle every 1/2 second
+        TB1CCR0 = 50000;                          // Set CCR0 to toggle every 1/2 second
         // Enable CCR0 interrupt
             TB1CCTL0 |= CCIE;
 
