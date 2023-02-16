@@ -8,7 +8,7 @@
  */
 
 #include <msp430.h>
-
+unsigned int t = 50000;
 void gpioInit();
 void timerInit();
 
@@ -74,21 +74,14 @@ __interrupt void Port_2(void)
        P2IFG &= ~BIT3; // clear P2.3 interrupt flag
 
        // @TODO When the button is pressed, you can change what the CCR0 Register is for the Timer. You will need to track what speed you should be flashing at.
-       static int speed = 0; // static variable to keep track of the speed
-
-       // Increment speed and loop back to 0 if over 2
-       speed = (speed + 1) % 3;
 
        // Update CCR0 value based on speed
-       if (speed == 0) {
-           // Slow speed: 1 second period
-           TB1CCR0 = 32768;
-       } else if (speed == 1) {
-           // Medium speed: 0.5 second period
-           TB1CCR0 = 32768/2;
+       if (t == 50000) {
+           t = 25000;
+       } else if (t == 25000) {
+           t = 10000;
        } else {
-           // Fast speed: 0.25 second period
-           TB1CCR0 = 32768/4;
+           t = 50000;
        }
 }
 
@@ -98,6 +91,8 @@ __interrupt void Port_2(void)
 __interrupt void Timer1_B0_ISR(void)
 {
     // @TODO You can toggle the LED Pin in this routine and if adjust your count in CCR0.
+    P1OUT ^= BIT0;
+    TB1CCR0 += t;
 }
 
 
