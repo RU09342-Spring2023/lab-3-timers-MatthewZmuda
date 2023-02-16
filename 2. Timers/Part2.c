@@ -52,6 +52,12 @@ void gpioInit(){
 
 void timerInit(){
     // @TODO Initialize Timer B1 in Continuous Mode using ACLK as the source CLK with Interrupts turned on
+    TB1CTL = TBSSEL_1 | MC_2 | TBCLR;           // ACLK, continuous mode, clear TAR
+    // Set CCR0 to control the LED blinking frequency
+        TB1CCR0 = 32768/2;                          // Set CCR0 to toggle every 1/2 second
+        // Enable CCR0 interrupt
+            TB1CCTL0 |= CCIE;
+
 
 }
 
@@ -65,9 +71,25 @@ void timerInit(){
 __interrupt void Port_2(void)
 {
     // @TODO Remember that when you service the GPIO Interrupt, you need to set the interrupt flag to 0.
+       P2IFG &= ~BIT3; // clear P2.3 interrupt flag
 
-    // @TODO When the button is pressed, you can change what the CCR0 Register is for the Timer. You will need to track what speed you should be flashing at.
+       // @TODO When the button is pressed, you can change what the CCR0 Register is for the Timer. You will need to track what speed you should be flashing at.
+       static int speed = 0; // static variable to keep track of the speed
 
+       // Increment speed and loop back to 0 if over 2
+       speed = (speed + 1) % 3;
+
+       // Update CCR0 value based on speed
+       if (speed == 0) {
+           // Slow speed: 1 second period
+           TB1CCR0 = 32768;
+       } else if (speed == 1) {
+           // Medium speed: 0.5 second period
+           TB1CCR0 = 32768/2;
+       } else {
+           // Fast speed: 0.25 second period
+           TB1CCR0 = 32768/4;
+       }
 }
 
 
